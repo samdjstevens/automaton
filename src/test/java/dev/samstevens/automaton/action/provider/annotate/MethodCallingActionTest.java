@@ -1,4 +1,4 @@
-package dev.samstevens.automaton.provider.annotate;
+package dev.samstevens.automaton.action.provider.annotate;
 
 import dev.samstevens.automaton.action.Action;
 import dev.samstevens.automaton.payload.Payload;
