@@ -1,6 +1,5 @@
 package dev.samstevens.automaton.payload;
 
-import com.sun.istack.internal.NotNull;
 import lombok.*;
 import java.time.Instant;
 
@@ -10,7 +9,7 @@ import java.time.Instant;
 @Builder
 public class Payload {
     private final String type;
-    @NotNull
+    @NonNull
     private final String message;
     private final String channel;
     private final String sender;
