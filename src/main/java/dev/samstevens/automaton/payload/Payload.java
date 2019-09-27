@@ -5,7 +5,6 @@ import java.time.Instant;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Setter
 @Builder
 public class Payload {
     private final String type;
