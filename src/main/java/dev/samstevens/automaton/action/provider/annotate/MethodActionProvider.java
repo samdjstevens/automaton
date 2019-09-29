@@ -5,6 +5,7 @@ import dev.samstevens.automaton.action.provider.ActionProvider;
 import dev.samstevens.automaton.action.provider.annotate.annotations.*;
 import dev.samstevens.automaton.payload.Payload;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -16,6 +17,11 @@ public class MethodActionProvider implements ActionProvider {
     private List<Action> actions = new ArrayList<>();
 
     public MethodActionProvider(Object actionsObject) {
+        // Class must be public so we can execute its methods without reflection tricks
+        if (! Modifier.isPublic(actionsObject.getClass().getModifiers())) {
+            throw new RuntimeException("Class must be public.");
+        }
+
         this.actionsObject = actionsObject;
         this.processActionsObject();
     }
@@ -118,6 +124,11 @@ public class MethodActionProvider implements ActionProvider {
     }
 
     private void validateMethodIsValidAction(Method method) {
+        // Method must be public so we can execute it without reflection tricks
+        if (! Modifier.isPublic(method.getModifiers())) {
+            throw new RuntimeException("Method must be public.");
+        }
+
         // Return type of the method must be a string
         if (! method.getReturnType().equals(String.class)) {
             throw new RuntimeException("Return type of action method must be a string.");

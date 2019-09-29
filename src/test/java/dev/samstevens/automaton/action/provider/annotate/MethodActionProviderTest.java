@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class MethodActionProviderTest {
 
-    private class TestActions {
+    public class TestActions {
         @Trigger("test-trigger")
         @Trigger("another-trigger")
         @Sender("MrUser")
@@ -28,16 +28,30 @@ public class MethodActionProviderTest {
         }
     }
 
-    private class ActionsWithWrongReturnType {
+    public class ActionsWithWrongReturnType {
         @Trigger("test")
         public Object theAction() {
             return null;
         }
     }
 
-    private class ActionsWithWrongParameterTypes {
+    public class ActionsWithWrongParameterTypes {
         @Trigger("test")
         public String theAction(Payload payload, Collection<String> wrongArgType) {
+            return null;
+        }
+    }
+
+    private class PrivateClass {
+        @Trigger("test")
+        public String theAction() {
+            return null;
+        }
+    }
+
+    public class PrivateMethodClass {
+        @Trigger("test")
+        private String theAction() {
             return null;
         }
     }
@@ -75,5 +89,15 @@ public class MethodActionProviderTest {
     @Test(expected = RuntimeException.class)
     public void testActionMethodThatHasInvalidParametersThrowsException() {
         new MethodActionProvider(new ActionsWithWrongParameterTypes());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testNonPublicClassThrowsException() {
+        new MethodActionProvider(new PrivateClass());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testNonPublicMethodThrowsException() {
+        new MethodActionProvider(new PrivateMethodClass());
     }
 }
