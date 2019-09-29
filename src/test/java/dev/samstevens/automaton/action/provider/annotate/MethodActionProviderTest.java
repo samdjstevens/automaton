@@ -63,22 +63,21 @@ public class MethodActionProviderTest {
 
         assertSame(2, actions.size());
 
-        // ensure same order for testing
-        actions.sort((a, b) -> 0);
+        // pick out the normal/fallback action
+        Action normalAction = actions.stream().filter(a -> ! a.isFallback()).findFirst().orElseThrow(RuntimeException::new);
+        Action fallbackAction = actions.stream().filter(Action::isFallback).findFirst().orElseThrow(RuntimeException::new);
 
         // first method/action
-        Action firstAction = actions.get(0);
-        assertEquals("test-trigger", firstAction.getTriggers().get(0));
-        assertEquals("another-trigger", firstAction.getTriggers().get(1));
-        assertEquals("MrUser", firstAction.getSenders().get(0));
-        assertEquals("AnotherUser", firstAction.getSenders().get(1));
-        assertEquals("the-channel", firstAction.getChannels().get(0));
-        assertEquals("another-channel", firstAction.getChannels().get(1));
-        assertFalse(firstAction.isFallback());
+        assertEquals("test-trigger", normalAction.getTriggers().get(0));
+        assertEquals("another-trigger", normalAction.getTriggers().get(1));
+        assertEquals("MrUser", normalAction.getSenders().get(0));
+        assertEquals("AnotherUser", normalAction.getSenders().get(1));
+        assertEquals("the-channel", normalAction.getChannels().get(0));
+        assertEquals("another-channel", normalAction.getChannels().get(1));
+        assertFalse(normalAction.isFallback());
 
-        // second method/action
-        Action secondAction = actions.get(1);
-        assertTrue(secondAction.isFallback());
+        // fallback method/action
+        assertTrue(fallbackAction.isFallback());
     }
 
     @Test(expected = RuntimeException.class)
