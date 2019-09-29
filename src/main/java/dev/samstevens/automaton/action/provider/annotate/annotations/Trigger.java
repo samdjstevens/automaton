@@ -7,7 +7,6 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface Trigger {
     String value() default "";
-    boolean caseSensitive() default false;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.METHOD})
