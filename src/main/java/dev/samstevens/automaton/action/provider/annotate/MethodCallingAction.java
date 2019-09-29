@@ -34,7 +34,7 @@ class MethodCallingAction implements Action {
             Object[] args = getMethodArguments(payload, matches);
             return (String) method.invoke(instanceToCallOn, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Fucked!");
+            throw new RuntimeException("Failed to invoke method action: " + e.getMessage());
         }
     }
 
