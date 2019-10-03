@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class ActionMatcher {
+public class ActionMatcher {
 
     private List<Action> actions;
 
-    ActionMatcher(List<Action> actions) {
+    public ActionMatcher(List<Action> actions) {
         this.actions = actions;
     }
 
-    MatchedAction getMatchingAction(Payload payload) {
+    public MatchedAction getMatchingAction(Payload payload) {
 
         for (Action action : actions) {
             MatchedAction matchedAction = matches(payload, action);

@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 @Getter
 @Builder
-class MatchedAction {
+public class MatchedAction {
     @NonNull
     private final Action action;
     private final String trigger;
