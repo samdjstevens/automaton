@@ -1,6 +1,7 @@
 package dev.samstevens.automaton.action.provider.annotate;
 
 import dev.samstevens.automaton.action.Action;
+import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
 import lombok.*;
 import java.lang.reflect.InvocationTargetException;
@@ -29,16 +30,16 @@ class MethodCallingAction implements Action {
     private final boolean isFallback;
 
     @Override
-    public String execute(Payload payload, String[] matches) {
+    public void execute(Payload payload, String[] matches, MessageSender messageSender) {
         try {
-            Object[] args = getMethodArguments(payload, matches);
-            return (String) method.invoke(instanceToCallOn, args);
+            Object[] args = getMethodArguments(payload, matches, messageSender);
+            method.invoke(instanceToCallOn, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("Failed to invoke method action: " + e.getMessage());
         }
     }
 
-    private Object[] getMethodArguments(Payload payload, String[] matches) {
+    private Object[] getMethodArguments(Payload payload, String[] matches, MessageSender messageSender) {
 
         // Create an array for the arguments to invoke the method with
         Object[] args = new Object[method.getParameters().length];
@@ -51,6 +52,10 @@ class MethodCallingAction implements Action {
         for (Parameter param : params) {
             if (param.getType().equals(Payload.class)) {
                 args[index] = payload;
+            }
+
+            if (param.getType().equals(MessageSender.class)) {
+                args[index] = messageSender;
             }
 
             if (param.getType().isArray()) {
