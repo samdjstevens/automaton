@@ -1,20 +1,20 @@
 package dev.samstevens.automaton.action.provider.annotate;
 
 import dev.samstevens.automaton.action.Action;
+import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
 import org.junit.Test;
 import java.lang.reflect.Method;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class MethodCallingActionTest {
 
     private class TestActions {
-        public String myAction() {
-            return "Hello, world!";
+        public void myAction() {
         }
 
-        public String anotherAction(Payload payload, String[] matches) {
-            return payload.getMessage() + matches[0];
+        public void anotherAction(Payload payload, String[] args) {
         }
     }
 
@@ -33,7 +33,6 @@ public class MethodCallingActionTest {
                 .isFallback(false)
                 .build();
 
-
         assertSame(testActions, action.getInstanceToCallOn());
         assertSame(method, action.getMethod());
         assertSame("Hello", action.getTriggers().get(0));
@@ -45,7 +44,7 @@ public class MethodCallingActionTest {
 
     @Test
     public void testMethodExecutes() throws NoSuchMethodException {
-        TestActions testActions = new TestActions();
+        TestActions testActions = mock(TestActions.class);
         Method method = testActions.getClass().getMethod("myAction");
 
         Action action = MethodCallingAction.builder()
@@ -60,14 +59,16 @@ public class MethodCallingActionTest {
 
         Payload payload = Payload.builder().message("Test").build();
 
-        String response = action.execute(payload, new String[]{});
+        // execute the action
+        action.execute(payload, new String[]{}, mock(MessageSender.class));
 
-        assertSame("Hello, world!", response);
+        // assert that the underlying method was invoked
+        verify(testActions, times(1)).myAction();
     }
 
     @Test
     public void testMethodParametersPassed() throws NoSuchMethodException {
-        TestActions testActions = new TestActions();
+        TestActions testActions = mock(TestActions.class);
         Method method = testActions.getClass().getMethod("anotherAction", Payload.class, java.lang.String[].class);
 
         Action action = MethodCallingAction.builder()
@@ -81,10 +82,13 @@ public class MethodCallingActionTest {
                 .build();
 
         Payload payload = Payload.builder().message("Test").build();
-
         String[] args = new String[]{"Test"};
-        String response = action.execute(payload, args);
+        MessageSender sender = mock(MessageSender.class);
 
-        assertEquals(payload.getMessage() + args[0], response);
+        // execute the action
+        action.execute(payload, args, sender);
+
+        // verify the method was called with the correct parameters
+        verify(testActions, times(1)).anotherAction(payload, args);
     }
 }

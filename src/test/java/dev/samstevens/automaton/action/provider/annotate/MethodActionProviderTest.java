@@ -28,13 +28,6 @@ public class MethodActionProviderTest {
         }
     }
 
-    public class ActionsWithWrongReturnType {
-        @Trigger("test")
-        public Object theAction() {
-            return null;
-        }
-    }
-
     public class ActionsWithWrongParameterTypes {
         @Trigger("test")
         public String theAction(Payload payload, Collection<String> wrongArgType) {
@@ -78,11 +71,6 @@ public class MethodActionProviderTest {
 
         // fallback method/action
         assertTrue(fallbackAction.isFallback());
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testActionMethodThatDoesNotReturnStringThrowsException() {
-        new MethodActionProvider(new ActionsWithWrongReturnType());
     }
 
     @Test(expected = RuntimeException.class)
