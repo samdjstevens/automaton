@@ -1,7 +1,7 @@
 package dev.samstevens.automaton.payload;
 
 import com.google.gson.Gson;
-import dev.samstevens.automaton.payload.adapter.SlackPayloadRequestTransformer;
+import dev.samstevens.automaton.payload.driver.SlackPayloadRequestTransformer;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;

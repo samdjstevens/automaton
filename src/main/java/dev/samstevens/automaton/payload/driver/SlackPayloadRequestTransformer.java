@@ -1,4 +1,4 @@
-package dev.samstevens.automaton.payload.adapter;
+package dev.samstevens.automaton.payload.driver;
 
 import com.google.gson.Gson;
 import dev.samstevens.automaton.payload.Payload;
