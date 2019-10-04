@@ -46,6 +46,6 @@ public class Automaton {
         MessageSender sender = driver.createMessageSender(payload.getChannel());
 
         // execute the action
-        matchedAction.getAction().execute(payload, matchedAction.getCaptures(), sender);
+        matchedAction.getAction().execute(this, payload, matchedAction.getCaptures(), sender);
     }
 }

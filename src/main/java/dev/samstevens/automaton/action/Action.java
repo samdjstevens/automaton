@@ -1,5 +1,6 @@
 package dev.samstevens.automaton.action;
 
+import dev.samstevens.automaton.Automaton;
 import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
 import java.util.List;
@@ -31,5 +32,5 @@ public interface Action {
      * @param payload The payload of the message that triggered the action.
      * @param matches Any regex capture groups in the triggering regex.
      */
-    void execute(Payload payload, String[] matches, MessageSender messageSender);
+    void execute(Automaton automaton, Payload payload, String[] matches, MessageSender messageSender);
 }

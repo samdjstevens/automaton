@@ -1,5 +1,6 @@
 package dev.samstevens.automaton.action.provider.annotate;
 
+import dev.samstevens.automaton.Automaton;
 import dev.samstevens.automaton.action.Action;
 import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
@@ -60,7 +61,7 @@ public class MethodCallingActionTest {
         Payload payload = Payload.builder().message("Test").build();
 
         // execute the action
-        action.execute(payload, new String[]{}, mock(MessageSender.class));
+        action.execute(mock(Automaton.class), payload, new String[]{}, mock(MessageSender.class));
 
         // assert that the underlying method was invoked
         verify(testActions, times(1)).myAction();
@@ -86,7 +87,7 @@ public class MethodCallingActionTest {
         MessageSender sender = mock(MessageSender.class);
 
         // execute the action
-        action.execute(payload, args, sender);
+        action.execute(mock(Automaton.class), payload, args, sender);
 
         // verify the method was called with the correct parameters
         verify(testActions, times(1)).anotherAction(payload, args);

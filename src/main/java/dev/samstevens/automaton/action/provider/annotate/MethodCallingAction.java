@@ -1,5 +1,6 @@
 package dev.samstevens.automaton.action.provider.annotate;
 
+import dev.samstevens.automaton.Automaton;
 import dev.samstevens.automaton.action.Action;
 import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
@@ -30,16 +31,16 @@ class MethodCallingAction implements Action {
     private final boolean isFallback;
 
     @Override
-    public void execute(Payload payload, String[] matches, MessageSender messageSender) {
+    public void execute(Automaton automaton, Payload payload, String[] matches, MessageSender messageSender) {
         try {
-            Object[] args = getMethodArguments(payload, matches, messageSender);
+            Object[] args = getMethodArguments(automaton, payload, matches, messageSender);
             method.invoke(instanceToCallOn, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("Failed to invoke method action: " + e.getMessage());
         }
     }
 
-    private Object[] getMethodArguments(Payload payload, String[] matches, MessageSender messageSender) {
+    private Object[] getMethodArguments(Automaton automaton, Payload payload, String[] matches, MessageSender messageSender) {
 
         // Create an array for the arguments to invoke the method with
         Object[] args = new Object[method.getParameters().length];
@@ -50,6 +51,10 @@ class MethodCallingAction implements Action {
         // Populate the arguments with either the Payload object or the matches
         int index = 0;
         for (Parameter param : params) {
+            if (param.getType().equals(Automaton.class)) {
+                args[index] = automaton;
+            }
+
             if (param.getType().equals(Payload.class)) {
                 args[index] = payload;
             }

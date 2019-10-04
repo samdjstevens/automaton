@@ -1,5 +1,6 @@
 package dev.samstevens.automaton.matcher;
 
+import dev.samstevens.automaton.Automaton;
 import dev.samstevens.automaton.action.Action;
 import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
@@ -19,6 +20,6 @@ public class TestAction implements Action {
     private List<String> channels;
     private final boolean isFallback;
     @Override
-    public void execute(Payload payload, String[] matches, MessageSender messageSender) {
+    public void execute(Automaton automaton, Payload payload, String[] matches, MessageSender messageSender) {
     }
 }
