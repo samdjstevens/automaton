@@ -3,6 +3,7 @@ package dev.samstevens.automaton;
 import dev.samstevens.automaton.driver.Driver;
 import dev.samstevens.automaton.matcher.ActionMatcher;
 import dev.samstevens.automaton.matcher.MatchedAction;
+import dev.samstevens.automaton.memory.Memory;
 import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
 import dev.samstevens.automaton.payload.PayloadRequestTransformingException;
@@ -11,12 +12,18 @@ import java.util.List;
 
 public class Automaton {
 
+    private final Memory memory;
     private final ActionMatcher actionMatcher;
     private final List<Driver> drivers;
 
-    public Automaton(ActionMatcher actionMatcher, List<Driver> drivers) {
+    public Automaton(Memory memory, ActionMatcher actionMatcher, List<Driver> drivers) {
+        this.memory = memory;
         this.actionMatcher = actionMatcher;
         this.drivers = drivers;
+    }
+
+    public Memory getMemory() {
+        return memory;
     }
 
     public void handleRequest(HttpServletRequest request) throws PayloadRequestTransformingException {
