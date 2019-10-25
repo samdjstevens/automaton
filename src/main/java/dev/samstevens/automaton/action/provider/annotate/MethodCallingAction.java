@@ -20,7 +20,10 @@ class MethodCallingAction implements Action {
     private final Method method;
 
     @Singular
-    private List<String> triggers;
+    private List<String> respondTriggers;
+
+    @Singular
+    private List<String> hearTriggers;
 
     @Singular
     private List<String> senders;

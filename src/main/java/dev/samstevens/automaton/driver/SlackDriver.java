@@ -9,10 +9,11 @@ import dev.samstevens.automaton.payload.PayloadRequestTransformer;
 import dev.samstevens.automaton.payload.driver.SlackPayloadRequestTransformer;
 
 public class SlackDriver implements Driver {
-    private final PayloadRequestTransformer transformer = new SlackPayloadRequestTransformer(new Gson());
+    private final PayloadRequestTransformer transformer;
     private final MethodsClient methodsClient;
 
-    public SlackDriver(String token) {
+    public SlackDriver(String botName, String token) {
+        transformer = new SlackPayloadRequestTransformer(new Gson(), botName);
         methodsClient = Slack.getInstance().methods(token);
     }
 

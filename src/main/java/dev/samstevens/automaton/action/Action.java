@@ -7,9 +7,14 @@ import java.util.List;
 
 public interface Action {
     /**
+     * @return The list of texts/regexes that trigger the action when @ing the bot.
+     */
+    List<String> getRespondTriggers();
+
+    /**
      * @return The list of texts/regexes that trigger the action.
      */
-    List<String> getTriggers();
+    List<String> getHearTriggers();
 
     /**
      * @return The list of channels that the triggering message must come from to apply.

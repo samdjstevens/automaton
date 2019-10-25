@@ -47,11 +47,14 @@ public class MethodActionProvider implements ActionProvider {
                 continue;
             }
 
-            // Read the @Trigger annotations for the method (if any exist)
-            List<String> triggers = getTriggers(method);
+            // Read the @Hear annotations for the method (if any exist)
+            List<String> hearTriggers = getHearTriggers(method);
 
-            // Method does not have a @Trigger annotation, not treated as an action
-            if (triggers.size() == 0) {
+            // Read the @Respond annotations for the method (if any exist)
+            List<String> respondTriggers = getRespondTriggers(method);
+
+            // If the method does not have a @Hear or @Respond annotation, not treated as an action
+            if (hearTriggers.size() == 0 && respondTriggers.size() == 0) {
                 continue;
             }
 
@@ -61,7 +64,8 @@ public class MethodActionProvider implements ActionProvider {
             MethodCallingAction methodCallingAction = MethodCallingAction.builder()
                     .instanceToCallOn(actionsObject)
                     .method(method)
-                    .triggers(triggers)
+                    .hearTriggers(hearTriggers)
+                    .respondTriggers(respondTriggers)
                     .senders(getSenders(method))
                     .channels(getChannels(method))
                     .isFallback(false)
@@ -71,16 +75,32 @@ public class MethodActionProvider implements ActionProvider {
         }
     }
 
-    private List<String> getTriggers(Method method) {
+    private List<String> getHearTriggers(Method method) {
         List<String> triggers = new ArrayList<>();
 
-        if (method.isAnnotationPresent(Trigger.class)) {
-            Trigger trigger = method.getAnnotation(Trigger.class);
+        if (method.isAnnotationPresent(Hear.class)) {
+            Hear trigger = method.getAnnotation(Hear.class);
             triggers.add(trigger.value());
         }
 
-        Trigger[] theTriggers = method.getAnnotationsByType(Trigger.class);
-        for (Trigger trigger : theTriggers) {
+        Hear[] theTriggers = method.getAnnotationsByType(Hear.class);
+        for (Hear trigger : theTriggers) {
+            triggers.add(trigger.value());
+        }
+
+        return triggers;
+    }
+
+    private List<String> getRespondTriggers(Method method) {
+        List<String> triggers = new ArrayList<>();
+
+        if (method.isAnnotationPresent(Respond.class)) {
+            Respond trigger = method.getAnnotation(Respond.class);
+            triggers.add(trigger.value());
+        }
+
+        Respond[] theTriggers = method.getAnnotationsByType(Respond.class);
+        for (Respond trigger : theTriggers) {
             triggers.add(trigger.value());
         }
 

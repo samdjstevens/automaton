@@ -13,4 +13,5 @@ public class Payload {
     private final String channel;
     private final String sender;
     private final Instant timestamp;
+    private final boolean isMention;
 }

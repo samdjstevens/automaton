@@ -13,7 +13,9 @@ import java.util.List;
 @Builder
 public class TestAction implements Action {
     @Singular
-    private List<String> triggers;
+    private List<String> hearTriggers;
+    @Singular
+    private List<String> respondTriggers;
     @Singular
     private List<String> senders;
     @Singular

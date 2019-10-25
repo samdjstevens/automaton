@@ -64,6 +64,20 @@ public class ActionMatcherTest {
     }
 
     @Test
+    public void testRespondTriggers() {
+        Payload payload;
+        MatchedAction matchedAction;
+        ActionMatcher matcher = new ActionMatcher(getTestActions());
+
+        payload = Payload.builder().message("@automaton show metrics").isMention(true).build();
+        matchedAction = matcher.getMatchingAction(payload);
+
+        assertNotNull(matchedAction);
+        assertNotNull(matchedAction.getAction());
+        assertEquals("show metrics", matchedAction.getTrigger());
+    }
+
+    @Test
     public void testChannelMustMatchWhenSet() {
         Payload payload;
         MatchedAction matchedAction;
@@ -133,33 +147,33 @@ public class ActionMatcherTest {
 
         // simple text trigger
         actions.add(TestAction.builder()
-            .trigger("Hello, bot")
-            .trigger("Hi, bot")
+            .hearTrigger("Hello, bot")
+            .hearTrigger("Hi, bot")
             .build()
         );
 
         // regex trigger with capture
         actions.add(TestAction.builder()
-            .trigger("What time is it in ([a-zA-Z]+/[a-zA-Z]+)\\?")
+            .hearTrigger("What time is it in ([a-zA-Z]+/[a-zA-Z]+)\\?")
             .build()
         );
 
         // regex trigger with multiple captures
         actions.add(TestAction.builder()
-            .trigger("Set an alarm for ([0-9]{2}:[0-9]{2}) on ([a-zA-Z]+)")
+            .hearTrigger("Set an alarm for ([0-9]{2}:[0-9]{2}) on ([a-zA-Z]+)")
             .build()
         );
 
         // support channel only action
         actions.add(TestAction.builder()
-            .trigger("Tell me a joke")
+            .hearTrigger("Tell me a joke")
             .channel("support")
             .build()
         );
 
         // support or help channels only action
         actions.add(TestAction.builder()
-            .trigger("Tell me a story")
+            .hearTrigger("Tell me a story")
             .channel("support")
             .channel("help")
             .build()
@@ -167,16 +181,22 @@ public class ActionMatcherTest {
 
         // specific sender only action
         actions.add(TestAction.builder()
-            .trigger("reset caches")
+            .hearTrigger("reset caches")
             .sender("MrAdmin")
             .build()
         );
 
         // multiple sender only action
         actions.add(TestAction.builder()
-            .trigger("show profile")
+            .hearTrigger("show profile")
             .sender("TheAdmin")
             .sender("user")
+            .build()
+        );
+
+        // respond trigger only action
+        actions.add(TestAction.builder()
+            .respondTrigger("show metrics")
             .build()
         );
 

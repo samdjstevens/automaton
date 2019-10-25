@@ -27,8 +27,9 @@ public class MethodCallingActionTest {
         MethodCallingAction action = MethodCallingAction.builder()
                 .instanceToCallOn(testActions)
                 .method(method)
-                .trigger("Hello")
-                .trigger("World")
+                .hearTrigger("Hello")
+                .hearTrigger("World")
+                .respondTrigger("Good morning")
                 .channel("the-channel")
                 .sender("MrUser")
                 .isFallback(false)
@@ -36,8 +37,9 @@ public class MethodCallingActionTest {
 
         assertSame(testActions, action.getInstanceToCallOn());
         assertSame(method, action.getMethod());
-        assertSame("Hello", action.getTriggers().get(0));
-        assertSame("World", action.getTriggers().get(1));
+        assertSame("Hello", action.getHearTriggers().get(0));
+        assertSame("World", action.getHearTriggers().get(1));
+        assertSame("Good morning", action.getRespondTriggers().get(0));
         assertSame("the-channel", action.getChannels().get(0));
         assertSame("MrUser", action.getSenders().get(0));
         assertSame(false, action.isFallback());
@@ -51,8 +53,8 @@ public class MethodCallingActionTest {
         Action action = MethodCallingAction.builder()
                 .instanceToCallOn(testActions)
                 .method(method)
-                .trigger("Hello")
-                .trigger("World")
+                .hearTrigger("Hello")
+                .hearTrigger("World")
                 .channel("the-channel")
                 .sender("MrUser")
                 .isFallback(false)
@@ -75,8 +77,8 @@ public class MethodCallingActionTest {
         Action action = MethodCallingAction.builder()
                 .instanceToCallOn(testActions)
                 .method(method)
-                .trigger("Hello")
-                .trigger("World")
+                .hearTrigger("Hello")
+                .hearTrigger("World")
                 .channel("the-channel")
                 .sender("MrUser")
                 .isFallback(false)

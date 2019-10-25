@@ -15,6 +15,7 @@ public class PayloadTest {
             .sender("MrUser")
             .type("direct_message")
             .timestamp(now)
+            .isMention(true)
             .build();
 
         assertNotNull(payload);
@@ -23,6 +24,7 @@ public class PayloadTest {
         assertSame("MrUser", payload.getSender());
         assertSame("direct_message", payload.getType());
         assertSame(now, payload.getTimestamp());
+        assertSame(true, payload.isMention());
     }
 
     @Test(expected = NullPointerException.class)
@@ -32,5 +34,12 @@ public class PayloadTest {
             .sender("MrUser")
             .type("direct_message")
             .build();
+    }
+
+    @Test
+    public void testIsMentionIsFalseByDefault() {
+        Payload payload = Payload.builder().message("test").build();
+
+        assertFalse(payload.isMention());
     }
 }

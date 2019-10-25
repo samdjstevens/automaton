@@ -12,8 +12,9 @@ import static org.junit.Assert.*;
 public class MethodActionProviderTest {
 
     public class TestActions {
-        @Trigger("test-trigger")
-        @Trigger("another-trigger")
+        @Hear("test-trigger")
+        @Hear("another-trigger")
+        @Respond("respond-trigger")
         @Sender("MrUser")
         @Sender("AnotherUser")
         @Channel("the-channel")
@@ -29,21 +30,21 @@ public class MethodActionProviderTest {
     }
 
     public class ActionsWithWrongParameterTypes {
-        @Trigger("test")
+        @Hear("test")
         public String theAction(Payload payload, Collection<String> wrongArgType) {
             return null;
         }
     }
 
     private class PrivateClass {
-        @Trigger("test")
+        @Hear("test")
         public String theAction() {
             return null;
         }
     }
 
     public class PrivateMethodClass {
-        @Trigger("test")
+        @Hear("test")
         private String theAction() {
             return null;
         }
@@ -61,8 +62,9 @@ public class MethodActionProviderTest {
         Action fallbackAction = actions.stream().filter(Action::isFallback).findFirst().orElseThrow(RuntimeException::new);
 
         // first method/action
-        assertEquals("test-trigger", normalAction.getTriggers().get(0));
-        assertEquals("another-trigger", normalAction.getTriggers().get(1));
+        assertEquals("test-trigger", normalAction.getHearTriggers().get(0));
+        assertEquals("another-trigger", normalAction.getHearTriggers().get(1));
+        assertEquals("respond-trigger", normalAction.getRespondTriggers().get(0));
         assertEquals("MrUser", normalAction.getSenders().get(0));
         assertEquals("AnotherUser", normalAction.getSenders().get(1));
         assertEquals("the-channel", normalAction.getChannels().get(0));
