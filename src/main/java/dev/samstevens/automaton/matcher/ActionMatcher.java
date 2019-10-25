@@ -46,20 +46,25 @@ public class ActionMatcher {
             return null;
         }
 
-        return matchesTrigger(action, payload.getMessage());
+        return matchesTrigger(action, payload);
     }
 
-    private MatchedAction matchesTrigger(Action action, String message) {
+    private MatchedAction matchesTrigger(Action action, Payload payload) {
+        String message = payload.getMessage();
+        List<String> triggers = payload.isMention() ? action.getRespondTriggers() : action.getHearTriggers();
+
         // No triggers, can't match
-        if (action.getTriggers() == null || action.getTriggers().size() == 0) {
+        if (triggers == null || triggers.size() == 0) {
             return null;
         }
 
         Pattern pattern;
-        for (String trigger : action.getTriggers()) {
+
+        // For each trigger, see if it matches anywhere *within* the message
+        for (String trigger : triggers) {
             pattern = Pattern.compile(trigger, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(message);
-            if (matcher.matches()) {
+            if (matcher.find()) {
 
                 String[] matches = new String[matcher.groupCount()];
                 for (int i = 1; i <= matcher.groupCount(); i++) {
