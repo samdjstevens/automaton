@@ -46,7 +46,7 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
         try (BufferedReader reader = request.getReader()) {
             slackPayload = gson.fromJson(reader, SlackJsonPayload.class);
         } catch (Exception e) {
-            throw new PayloadRequestTransformingException();
+            throw new PayloadRequestTransformingException(e);
         }
 
         return Payload.builder()
