@@ -9,6 +9,7 @@ import lombok.Setter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.time.Instant;
+import java.util.regex.Pattern;
 
 public class SlackPayloadRequestTransformer implements PayloadRequestTransformer {
 
@@ -23,9 +24,11 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
     }
 
     private final Gson gson;
+    private final Pattern botNameMentionPattern;
 
-    public SlackPayloadRequestTransformer(Gson gson) {
+    public SlackPayloadRequestTransformer(Gson gson, String botName) {
         this.gson = gson;
+        this.botNameMentionPattern = Pattern.compile("@" + botName);
     }
 
     /**
@@ -52,6 +55,7 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
             .sender(slackPayload.getUser())
             .timestamp(timestampFromSlackPayload(slackPayload))
             .message(slackPayload.getText())
+            .isMention(payloadIsBotMention(slackPayload))
             .build();
     }
 
@@ -59,5 +63,9 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
         String epoch = payload.getTs().split("\\.")[0];
 
         return Instant.ofEpochSecond(Long.valueOf(epoch));
+    }
+
+    private boolean payloadIsBotMention(SlackJsonPayload payload) {
+        return payload.getType().equals("app_mention") && botNameMentionPattern.matcher(payload.getText()).find();
     }
 }
