@@ -12,6 +12,10 @@ public class SlackMessageSender implements MessageSender {
         this.channel = channel;
     }
 
+    public String getDefaultChannel() {
+        return channel;
+    }
+
     @Override
     public void send(String message) {
         send(message, this.channel);
