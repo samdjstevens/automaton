@@ -5,6 +5,7 @@ import dev.samstevens.automaton.action.Action;
 import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
 import org.junit.Test;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -16,6 +17,9 @@ public class MethodCallingActionTest {
         }
 
         public void anotherAction(Payload payload, String[] args) {
+        }
+
+        private void privateAction() {
         }
     }
 
@@ -43,6 +47,27 @@ public class MethodCallingActionTest {
         assertSame("the-channel", action.getChannels().get(0));
         assertSame("MrUser", action.getSenders().get(0));
         assertSame(false, action.isFallback());
+
+        // test clearers
+        action = MethodCallingAction.builder()
+                .instanceToCallOn(testActions)
+                .method(method)
+                .hearTrigger("Hello")
+                .hearTrigger("World")
+                .respondTrigger("Good morning")
+                .channel("the-channel")
+                .sender("MrUser")
+                .isFallback(false)
+                .clearChannels()
+                .clearHearTriggers()
+                .clearRespondTriggers()
+                .clearSenders()
+                .build();
+
+        assertEquals(0, action.getChannels().size());
+        assertEquals(0, action.getHearTriggers().size());
+        assertEquals(0, action.getRespondTriggers().size());
+        assertEquals(0, action.getSenders().size());
     }
 
     @Test
@@ -67,6 +92,28 @@ public class MethodCallingActionTest {
 
         // assert that the underlying method was invoked
         verify(testActions, times(1)).myAction();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testInvocationTargetExceptionThrowsRuntimeException() throws NoSuchMethodException {
+        TestActions testActions = new TestActions();
+        Method method = testActions.getClass().getDeclaredMethod("privateAction");
+
+        Action action = MethodCallingAction.builder()
+                .instanceToCallOn(testActions)
+                .method(method)
+                .hearTrigger("Hello")
+                .hearTrigger("World")
+                .channel("the-channel")
+                .sender("MrUser")
+                .isFallback(false)
+                .build();
+
+        Payload payload = Payload.builder().message("Test").build();
+
+        // execute the action
+        // should throw exception as the method is private
+        action.execute(mock(Automaton.class), payload, new String[]{}, mock(MessageSender.class));
     }
 
     @Test
