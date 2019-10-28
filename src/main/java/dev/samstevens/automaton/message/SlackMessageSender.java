@@ -1,6 +1,9 @@
 package dev.samstevens.automaton.message;
 
 import com.github.seratch.jslack.api.methods.MethodsClient;
+import com.github.seratch.jslack.api.methods.SlackApiException;
+import com.github.seratch.jslack.api.methods.request.chat.ChatPostMessageRequest;
+import java.io.IOException;
 
 public class SlackMessageSender implements MessageSender {
 
@@ -24,8 +27,13 @@ public class SlackMessageSender implements MessageSender {
     @Override
     public void send(String message, String channel) {
         try {
-            methodsClient.chatPostMessage(req -> req.channel(channel).text(message));
-        } catch (Exception e) {
+            ChatPostMessageRequest request = ChatPostMessageRequest.builder()
+                .text(message)
+                .channel(channel)
+                .build();
+
+            methodsClient.chatPostMessage(request);
+        } catch (IOException | SlackApiException e) {
             throw new RuntimeException("failed to send message", e);
         }
     }
