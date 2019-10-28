@@ -5,7 +5,6 @@ import dev.samstevens.automaton.action.Action;
 import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
 import org.junit.Test;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
