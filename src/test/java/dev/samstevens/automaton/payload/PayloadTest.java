@@ -28,12 +28,22 @@ public class PayloadTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testMessageCannotBeNull() {
+    public void testMessageCannotBeExcluded() {
         Payload.builder()
             .channel("the-channel")
             .sender("MrUser")
             .type("direct_message")
             .build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testMessageCannotBeNull() {
+        Payload.builder()
+                .channel("the-channel")
+                .sender("MrUser")
+                .type("direct_message")
+                .message(null)
+                .build();
     }
 
     @Test
