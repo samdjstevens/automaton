@@ -1,7 +1,15 @@
 {
-  "type": "app_mention",
-  "channel": "C2147483705",
-  "user": "U2147483697",
-  "text": "Hello @automaton",
-  "ts": "1355517523.000005"
+  "token": "xxxxxxxxx",
+  "team_id": "xxxxxxxxx",
+  "api_app_id": "xxxxxxxxx",
+  "event": {
+    "type": "app_mention",
+    "channel": "C2147483705",
+    "user": "U2147483697",
+    "text": "Hello @automaton",
+    "ts": "1355517523.000005"
+  },
+  "type": "event_callback",
+  "event_id": "Ev0LAN670R",
+  "event_time": 1515449522000016
 }

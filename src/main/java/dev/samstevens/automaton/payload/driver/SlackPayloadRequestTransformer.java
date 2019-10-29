@@ -16,11 +16,17 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
     @Getter
     @Setter
     private class SlackJsonPayload {
+        @Getter
+        @Setter
+        class SlackEventJsonPayload {
+            private String type;
+            private String channel;
+            private String text;
+            private String user;
+            private String ts;
+        }
         private String type;
-        private String channel;
-        private String text;
-        private String user;
-        private String ts;
+        private SlackEventJsonPayload event;
     }
 
     private final Gson gson;
@@ -49,23 +55,32 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
             throw new PayloadRequestTransformingException(e);
         }
 
+        // no event found in the request body
+        if (slackPayload == null || slackPayload.getEvent() == null) {
+            return null;
+        }
+
         return Payload.builder()
-            .type(slackPayload.getType())
-            .channel(slackPayload.getChannel())
-            .sender(slackPayload.getUser())
+            .type(slackPayload.getEvent().getType())
+            .channel(slackPayload.getEvent().getChannel())
+            .sender(slackPayload.getEvent().getUser())
             .timestamp(timestampFromSlackPayload(slackPayload))
-            .message(slackPayload.getText())
+            .message(slackPayload.getEvent().getText())
             .isMention(payloadIsBotMention(slackPayload))
             .build();
     }
 
     private Instant timestampFromSlackPayload(SlackJsonPayload payload) {
-        String epoch = payload.getTs().split("\\.")[0];
+        if (payload.getEvent().getTs() == null) {
+            return null;
+        }
+        
+        String epoch = payload.getEvent().getTs().split("\\.")[0];
 
         return Instant.ofEpochSecond(Long.valueOf(epoch));
     }
 
     private boolean payloadIsBotMention(SlackJsonPayload payload) {
-        return payload.getType().equals("app_mention") && botNameMentionPattern.matcher(payload.getText()).find();
+        return payload.getEvent().getType().equals("app_mention") && botNameMentionPattern.matcher(payload.getEvent().getText()).find();
     }
 }
