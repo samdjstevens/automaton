@@ -149,11 +149,6 @@ public class MethodActionProvider implements ActionProvider {
             throw new RuntimeException("Method must be public.");
         }
 
-        // Return type of the method must be a string
-        if (! method.getReturnType().equals(String.class)) {
-            throw new RuntimeException("Return type of action method must be a string.");
-        }
-
         // Check the parameters for the method are of the supported types
         List<Type> supportedParamTypes = new ArrayList<>();
         supportedParamTypes.add(Payload.class);
