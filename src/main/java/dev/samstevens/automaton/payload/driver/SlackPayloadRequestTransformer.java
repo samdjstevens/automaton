@@ -34,12 +34,10 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
 
     private final Gson gson;
     private final SlackRequestSignatureValidator requestSignatureValidator;
-    private final Pattern botNameMentionPattern;
 
-    public SlackPayloadRequestTransformer(Gson gson, SlackRequestSignatureValidator requestSignatureValidator, String botName) {
+    public SlackPayloadRequestTransformer(Gson gson, SlackRequestSignatureValidator requestSignatureValidator) {
         this.gson = gson;
         this.requestSignatureValidator = requestSignatureValidator;
-        this.botNameMentionPattern = Pattern.compile("@" + botName);
     }
 
     /**
@@ -92,7 +90,7 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
     }
 
     private boolean payloadIsBotMention(SlackJsonPayload payload) {
-        return payload.getEvent().getType().equals("app_mention") && botNameMentionPattern.matcher(payload.getEvent().getText()).find();
+        return payload.getEvent().getType().equals("app_mention");
     }
 
     private boolean requestSignatureIsValid(HttpServletRequest request) {

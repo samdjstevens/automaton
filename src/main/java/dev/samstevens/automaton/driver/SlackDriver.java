@@ -13,9 +13,9 @@ public class SlackDriver implements Driver {
     private final PayloadRequestTransformer transformer;
     private final MethodsClient methodsClient;
 
-    public SlackDriver(String botName, String token, String signingSecret) {
+    public SlackDriver(String token, String signingSecret) {
         SlackRequestSignatureValidator validator = new SlackRequestSignatureValidator(signingSecret);
-        transformer = new SlackPayloadRequestTransformer(new Gson(), validator, botName);
+        transformer = new SlackPayloadRequestTransformer(new Gson(), validator);
         methodsClient = Slack.getInstance().methods(token);
     }
 

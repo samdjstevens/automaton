@@ -51,9 +51,6 @@ public class SlackPayloadRequestTransformerTest {
         Payload payload = payloadRequestTransformer.transformRequest(getSlackRequest());
         assertFalse(payload.isMention());
 
-        payload = payloadRequestTransformer.transformRequest(getSlackRequestWithOtherPersonMention());
-        assertFalse(payload.isMention());
-
         payload = payloadRequestTransformer.transformRequest(getSlackRequestWithBotMention());
         assertTrue(payload.isMention());
     }
@@ -61,14 +58,6 @@ public class SlackPayloadRequestTransformerTest {
     private HttpServletRequest getSlackRequest() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getInputStream()).thenReturn(readRequestStubIntoStream("/payload/slack_request_body.json"));
-        when(request.getHeader("X-Slack-Request-Timestamp")).thenReturn(Instant.now().toString());
-
-        return request;
-    }
-
-    private HttpServletRequest getSlackRequestWithOtherPersonMention() throws IOException {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getInputStream()).thenReturn(readRequestStubIntoStream("/payload/slack_mention_request_body.json"));
         when(request.getHeader("X-Slack-Request-Timestamp")).thenReturn(Instant.now().toString());
 
         return request;
@@ -86,7 +75,7 @@ public class SlackPayloadRequestTransformerTest {
         SlackRequestSignatureValidator validator = mock(SlackRequestSignatureValidator.class);
         when(validator.isValid(any(),any(), any())).thenReturn(true);
 
-        return new SlackPayloadRequestTransformer(new Gson(), validator, "automaton");
+        return new SlackPayloadRequestTransformer(new Gson(), validator);
     }
 
     private HttpServletRequest getBadRequest() throws IOException {
