@@ -27,10 +27,18 @@ public class Automaton {
     }
 
     public void handleRequest(HttpServletRequest request) throws PayloadRequestTransformingException {
+        // Wrap the request in a class that allows the body input stream
+        // to be read more than once
+        HttpServletRequest wrappedRequest = new BodyCachingHttpServletRequestWrapper(request);
+
         for (Driver driver : drivers) {
-            if (driver.getPayloadRequestTransformer().shouldTransformRequest(request)) {
-                Payload payload = driver.getPayloadRequestTransformer().transformRequest(request);
-                handlePayload(driver, payload);
+            if (driver.getPayloadRequestTransformer().shouldTransformRequest(wrappedRequest)) {
+                Payload payload = driver.getPayloadRequestTransformer().transformRequest(wrappedRequest);
+
+                if (payload != null){
+                    handlePayload(driver, payload);
+                }
+
             }
         }
     }

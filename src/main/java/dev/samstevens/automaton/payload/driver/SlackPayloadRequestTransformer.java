@@ -8,8 +8,11 @@ import lombok.Getter;
 import lombok.Setter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class SlackPayloadRequestTransformer implements PayloadRequestTransformer {
 
@@ -30,10 +33,12 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
     }
 
     private final Gson gson;
+    private final SlackRequestSignatureValidator requestSignatureValidator;
     private final Pattern botNameMentionPattern;
 
-    public SlackPayloadRequestTransformer(Gson gson, String botName) {
+    public SlackPayloadRequestTransformer(Gson gson, SlackRequestSignatureValidator requestSignatureValidator, String botName) {
         this.gson = gson;
+        this.requestSignatureValidator = requestSignatureValidator;
         this.botNameMentionPattern = Pattern.compile("@" + botName);
     }
 
@@ -42,15 +47,21 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
      */
     @Override
     public boolean shouldTransformRequest(HttpServletRequest request) {
-        return request.getHeader("X-Slack-Request-Timestamp") != null;
+        // If not a request from Slack, exit early
+        if (request.getHeader("X-Slack-Request-Timestamp") == null) {
+            return false;
+        }
+
+        // Validate the signature to ensure the request is from Slack and for the bot
+        return requestSignatureIsValid(request);
     }
 
     @Override
     public Payload transformRequest(HttpServletRequest request) throws PayloadRequestTransformingException {
 
         SlackJsonPayload slackPayload;
-        try (BufferedReader reader = request.getReader()) {
-            slackPayload = gson.fromJson(reader, SlackJsonPayload.class);
+        try {
+            slackPayload = gson.fromJson(getRequestBody(request), SlackJsonPayload.class);
         } catch (Exception e) {
             throw new PayloadRequestTransformingException(e);
         }
@@ -82,5 +93,22 @@ public class SlackPayloadRequestTransformer implements PayloadRequestTransformer
 
     private boolean payloadIsBotMention(SlackJsonPayload payload) {
         return payload.getEvent().getType().equals("app_mention") && botNameMentionPattern.matcher(payload.getEvent().getText()).find();
+    }
+
+    private boolean requestSignatureIsValid(HttpServletRequest request) {
+        return requestSignatureValidator.isValid(
+            request.getHeader("X-Slack-Request-Timestamp"),
+            getRequestBody(request),
+            request.getHeader("X-Slack-Signature")
+        );
+    }
+
+    private String getRequestBody(HttpServletRequest request) {
+        try (InputStream stream = request.getInputStream()) {
+            return new BufferedReader(new InputStreamReader(stream))
+                    .lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (Exception e) {
+            throw new RuntimeException("Could not read request body.", e);
+        }
     }
 }
