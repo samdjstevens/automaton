@@ -2,11 +2,14 @@ package dev.samstevens.automaton.payload;
 
 import com.google.gson.Gson;
 import dev.samstevens.automaton.payload.driver.SlackPayloadRequestTransformer;
+import dev.samstevens.automaton.payload.driver.SlackRequestSignatureValidator;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.time.Instant;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.*;
@@ -57,8 +60,7 @@ public class SlackPayloadRequestTransformerTest {
 
     private HttpServletRequest getSlackRequest() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getReader()).thenReturn(
-                new BufferedReader(new StringReader(readRequestStub("/payload/slack_request_body.json"))));
+        when(request.getInputStream()).thenReturn(readRequestStubIntoStream("/payload/slack_request_body.json"));
         when(request.getHeader("X-Slack-Request-Timestamp")).thenReturn(Instant.now().toString());
 
         return request;
@@ -66,8 +68,7 @@ public class SlackPayloadRequestTransformerTest {
 
     private HttpServletRequest getSlackRequestWithOtherPersonMention() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getReader()).thenReturn(
-                new BufferedReader(new StringReader(readRequestStub("/payload/slack_mention_request_body.json"))));
+        when(request.getInputStream()).thenReturn(readRequestStubIntoStream("/payload/slack_mention_request_body.json"));
         when(request.getHeader("X-Slack-Request-Timestamp")).thenReturn(Instant.now().toString());
 
         return request;
@@ -75,21 +76,22 @@ public class SlackPayloadRequestTransformerTest {
 
     private HttpServletRequest getSlackRequestWithBotMention() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getReader()).thenReturn(
-                new BufferedReader(new StringReader(readRequestStub("/payload/slack_bot_mention_request_body.json"))));
+        when(request.getInputStream()).thenReturn(readRequestStubIntoStream("/payload/slack_bot_mention_request_body.json"));
         when(request.getHeader("X-Slack-Request-Timestamp")).thenReturn(Instant.now().toString());
 
         return request;
     }
 
     private PayloadRequestTransformer getSlackPayloadRequestTransformer() {
-        return new SlackPayloadRequestTransformer(new Gson(), "automaton");
+        SlackRequestSignatureValidator validator = mock(SlackRequestSignatureValidator.class);
+        when(validator.isValid(any(),any(), any())).thenReturn(true);
+
+        return new SlackPayloadRequestTransformer(new Gson(), validator, "automaton");
     }
 
     private HttpServletRequest getBadRequest() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getReader()).thenReturn(
-                new BufferedReader(new StringReader(readRequestStub("/payload/malformed_request_body.json"))));
+        when(request.getInputStream()).thenReturn(readRequestStubIntoStream("/payload/malformed_request_body.json"));
         when(request.getHeader("X-Slack-Request-Timestamp")).thenReturn(Instant.now().toString());
 
         return request;
@@ -97,8 +99,7 @@ public class SlackPayloadRequestTransformerTest {
 
     private HttpServletRequest getOtherRequest() throws IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getReader()).thenReturn(
-                new BufferedReader(new StringReader(readRequestStub("/payload/other_request_body.json"))));
+        when(request.getInputStream()).thenReturn(readRequestStubIntoStream("/payload/other_request_body.json"));
 
         return request;
     }
@@ -106,17 +107,23 @@ public class SlackPayloadRequestTransformerTest {
     /**
      * Helper method to read the stub file request JSON.
      */
-    private String readRequestStub(String filename) throws IOException {
+    private ServletInputStream readRequestStubIntoStream(String filename) throws IOException {
         InputStream stream = this.getClass().getResourceAsStream(filename);
-        StringBuilder resultStringBuilder = new StringBuilder();
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                resultStringBuilder.append(line).append("\n");
-            }
+        byte[] body;
+        try {
+            body = IOUtils.toByteArray(stream);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not read request InputStream.", e);
         }
 
-        return resultStringBuilder.toString().trim();
+        return new ServletInputStream() {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(body);
+
+            @Override
+            public int read() throws IOException {
+                return inputStream.read();
+            }
+        };
     }
 }

@@ -26,6 +26,6 @@ public class SlackDriverTest {
     }
 
     private Driver getSlackDriver() {
-        return new SlackDriver("automaton", "my-secret-token");
+        return new SlackDriver("automaton", "signing-secret", "my-secret-token");
     }
 }
