@@ -6,34 +6,31 @@ import dev.samstevens.automaton.action.provider.ActionProvider;
 import dev.samstevens.automaton.action.provider.annotate.MethodActionProvider;
 import dev.samstevens.automaton.driver.Driver;
 import dev.samstevens.automaton.memory.Memory;
+import dev.samstevens.automaton.memory.ShortTermMemory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Configuration
 @ComponentScan("dev.samstevens.automaton.spring")
 public class AutomatonConfig {
 
-    @Autowired
+    @Autowired(required = false)
     Memory memory;
 
-    @Autowired
+    @Autowired(required = false)
     List<Driver> drivers;
 
-    @Autowired
+    @Autowired(required = false)
     @Actions
     List<Object> actions;
 
-
     @Bean
-    public List<ActionProvider> getActionProviders() {
+    public List<ActionProvider> getAutomatonActionProviders() {
         List<ActionProvider> list = new ArrayList<>();
-
 
         for (Object bean : actions) {
             list.add(new MethodActionProvider(bean));
@@ -41,21 +38,27 @@ public class AutomatonConfig {
 
         return list;
     }
+
     @Bean
-    public Automaton getAutomaton() {
+    public Automaton getAutomaton(List<ActionProvider> actionProviders) {
+        AutomatonBuilder builder = new AutomatonBuilder();
 
-        AutomatonBuilder b = new AutomatonBuilder()
-                .memory(memory);
-
-        for (ActionProvider ap : getActionProviders()) {
-            b.actionProvider(ap);
+        // Give the bot short term memory if no Memory bean specified by
+        // the consuming spring app
+        if (memory == null) {
+            builder.memory(new ShortTermMemory());
+        } else {
+            builder.memory(memory);
         }
 
-        for (Driver d : drivers) {
-            b.driver(d);
+        for (ActionProvider actionprovider : actionProviders) {
+            builder.actionProvider(actionprovider);
         }
 
-        return b.build();
+        for (Driver driver : drivers) {
+            builder.driver(driver);
+        }
+
+        return builder.build();
     }
-
 }
