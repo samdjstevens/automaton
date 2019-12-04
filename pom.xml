@@ -6,7 +6,7 @@
 
   <groupId>dev.samstevens.automaton</groupId>
   <artifactId>automaton</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 
   <name>automaton</name>
   <!-- FIXME change it to the project's website -->
