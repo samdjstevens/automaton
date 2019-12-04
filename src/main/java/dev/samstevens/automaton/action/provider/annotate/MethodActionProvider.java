@@ -3,6 +3,7 @@ package dev.samstevens.automaton.action.provider.annotate;
 import dev.samstevens.automaton.action.Action;
 import dev.samstevens.automaton.action.provider.ActionProvider;
 import dev.samstevens.automaton.action.provider.annotate.annotations.*;
+import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -153,6 +154,7 @@ public class MethodActionProvider implements ActionProvider {
         List<Type> supportedParamTypes = new ArrayList<>();
         supportedParamTypes.add(Payload.class);
         supportedParamTypes.add(java.lang.String[].class);
+        supportedParamTypes.add(MessageSender.class);
 
         for (Parameter parameter : method.getParameters()) {
             if (!supportedParamTypes.contains(parameter.getType())) {
