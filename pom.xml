@@ -8,6 +8,20 @@
   <artifactId>automaton</artifactId>
   <version>1.0</version>
 
+  <developers>
+    <developer>
+      <name>Sam Stevens</name>
+      <email>samdjstevens@googlemail.com</email>
+      <organizationUrl>https://github.com/samdjstevens</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <developerConnection>scm:git:git@github.com:samdjstevens/automaton.git</developerConnection>
+    <tag>automaton-1.0</tag>
+    <url>https://github.com/samdjstevens/automaton</url>
+  </scm>
+
   <name>automaton</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
