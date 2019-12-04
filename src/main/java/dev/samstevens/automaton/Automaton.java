@@ -8,6 +8,7 @@ import dev.samstevens.automaton.message.MessageSender;
 import dev.samstevens.automaton.payload.Payload;
 import dev.samstevens.automaton.payload.PayloadRequestTransformingException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 public class Automaton {
@@ -26,10 +27,15 @@ public class Automaton {
         return memory;
     }
 
-    public void handleRequest(HttpServletRequest request) throws PayloadRequestTransformingException {
+    public void handleRequest(HttpServletRequest request) throws PayloadRequestTransformingException{
         // Wrap the request in a class that allows the body input stream
         // to be read more than once
-        HttpServletRequest wrappedRequest = new BodyCachingHttpServletRequestWrapper(request);
+        HttpServletRequest wrappedRequest;
+        try {
+            wrappedRequest = new CustomHttpServletRequestWrapper(request);
+        } catch (IOException e) {
+            return;
+        }
 
         for (Driver driver : drivers) {
             if (driver.getPayloadRequestTransformer().shouldTransformRequest(wrappedRequest)) {
