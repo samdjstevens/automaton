@@ -8,6 +8,7 @@ import dev.samstevens.automaton.driver.Driver;
 import dev.samstevens.automaton.memory.Memory;
 import dev.samstevens.automaton.memory.ShortTermMemory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,16 @@ public class AutomatonConfig {
     @Autowired(required = false)
     @Actions
     List<Object> actions;
+
+    @Bean
+    public FilterRegistrationBean<ChallengeRequestFilter> loggingFilter(){
+        FilterRegistrationBean<ChallengeRequestFilter> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(new ChallengeRequestFilter());
+        registrationBean.addUrlPatterns("/");
+
+        return registrationBean;
+    }
 
     @Bean
     public List<ActionProvider> getAutomatonActionProviders() {
